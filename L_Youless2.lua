@@ -1,7 +1,7 @@
 --[==[
 Module L_Youless2.lua
 Written by V. Pathuis (Vinx)
-Only support UI7
+Only supports UI7
 V0.1 - 17 November 2019
 Initial version. 
 Support for LS110 & LS120

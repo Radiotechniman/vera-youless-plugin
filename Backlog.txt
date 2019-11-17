@@ -1,9 +1,0 @@
-Configure IP-address
-Read S0
-Child for S0 output
-
-Support for gross / net usage when S0 is used
-Children for reading from P1
-Another nice feature would we if the gas usage can be retrieved
-Support for password
-Update frequentie instelbaar

@@ -10,3 +10,4 @@ Support for reading S0 port Watt & KWH and optionally create a child device
 - Choose the ip-address of the Youless for IP address
 - Press Create
 - Force manual luup reload
+- For a seperate device for the S0-readings, set ChildDeviceS0 to 1 in the Advanced > Variables tab.

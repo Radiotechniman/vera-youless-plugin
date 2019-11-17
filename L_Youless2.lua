@@ -1,6 +1,6 @@
 --[==[
 Module L_Youless2.lua
-Written by Vincent Pathuis (Vinx)
+Written by V. Pathuis (Vinx)
 Only support UI7
 V0.1 - 17 November 2019
 Initial version. 

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<implementation>
+  <settings>
+    <protocol>crlf</protocol>
+	<handleChildren>1</handleChildren>
+</settings>
+  <files>L_Youless2.lua</files>
+  <startup>Youless_Init</startup>
+  <actionList>
+	  
+  </actionList>
+</implementation>

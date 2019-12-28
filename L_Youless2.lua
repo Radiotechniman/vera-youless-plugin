@@ -2,7 +2,7 @@
 Module L_Youless2.lua
 Written by V. Pathuis (Vinx)
 Only supports UI7
-V0.1 - 17 November 2019
+V1.0 - 28 December 2019
 Initial version. 
 Support for LS110 & LS120
 Support for Watt & KWH
@@ -113,7 +113,7 @@ function Youless_Init(youless_device)
     -- check the connection
     local status, page = luup.inet.wget(YOULESS_URL_ACTUAL)
     if ((status or 0) ~= 0) then
-        return false, "Conntection to YouLess failed. Verify the Youless ip-address.", string.format("%s[%d]", luup.devices[YOULESS_DEVICE].description, YOULESS_DEVICE)
+        return false, "Connection to YouLess failed. Verify the Youless ip-address.", string.format("%s[%d]", luup.devices[YOULESS_DEVICE].description, YOULESS_DEVICE)
     end
 
     status,page = luup.inet.wget(YOULESS_URL_DEVICE)

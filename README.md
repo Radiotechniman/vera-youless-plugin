@@ -2,6 +2,7 @@
 Plugin for Vera Home Automation for YouLess LS110 and YouLess LS120. 
 Support for reading actual Watt & KWH.
 Support for reading S0 port Watt & KWH and optionally create a child device
+App store plugin id=9286
 
 # Install
 - Upload files on the Vera

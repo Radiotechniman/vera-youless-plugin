@@ -92,6 +92,7 @@ local function readYouLess()
             end
         end
     end
+    luup.log("Youless2: reading finished")
 end
 
 function refreshCache()
@@ -141,7 +142,7 @@ function Youless_Init(youless_device)
         if ((ChildDeviceS0 or "") == "") then
             luup.variable_set(YOULESS_SERVICE, "ChildDeviceS0", 0, YOULESS_DEVICE)
         end
-        luup.log("Youless2: ChildDeviceS0=" .. ChildDeviceS0)
+        if (ChildDeviceS0 ~= nil) then luup.log("Youless2: ChildDeviceS0=" .. ChildDeviceS0) end
 
         -- create child devices if needed
         local child_devices = luup.chdev.start(YOULESS_DEVICE)
@@ -165,6 +166,8 @@ function Youless_Init(youless_device)
     end
 
     readYouLess()
-    luup.set_failure(0, YOULESS_DEVICE)
+    luup.log("Youless2: init succesful")
+    -- This doesn't work in UI5: luup.set_failure(0, YOULESS_DEVICE)
+    luup.variable_set(HA_SERVICE,"CommFailure",0, YOULESS_DEVICE)
     luup.call_timer("refreshCache", 1, YOULESS_INTERVAL, "")
 end

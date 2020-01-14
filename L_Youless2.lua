@@ -33,7 +33,7 @@ local function readYouLess()
     status,page = luup.inet.wget(YOULESS_URL_ACTUAL)
 
     if (status == -1) then
-        luup.log("Error connecting to YouLess. Could it be there is a password set?")
+        luup.log("Youless2: Error connecting to YouLess. Could it be there is a password set?")
         luup.variable_set(HA_SERVICE,"CommFailure",1, YOULESS_DEVICE)
     else 
         -- read pwr (watts)
@@ -41,9 +41,9 @@ local function readYouLess()
         if (watts ~= nil and watts ~= '') then
             watts = tonumber(watts)
             luup.variable_set(ENERGY_SERVICE, "Watts", watts, YOULESS_DEVICE)
-            luup.log("YouLess pwr (watts)="..watts)
+            luup.log("Youless2: pwr (watts)="..watts)
         else 
-            luup.log("Response from YouLess respons invalid: does not contain pwr")
+            luup.log("Youless2: Response from YouLess respons invalid: does not contain pwr")
             luup.variable_set(HA_SERVICE,"CommFailure",1, YOULESS_DEVICE)
         end
 
@@ -53,46 +53,46 @@ local function readYouLess()
             kwh = string.gsub(kwh,",",".")
             kwh = tonumber(kwh)
             luup.variable_set(ENERGY_SERVICE,"KWH", kwh, YOULESS_DEVICE)
-            luup.log("YouLess kwh (cnt)=".. kwh)
+            luup.log("Youless2: kwh (cnt)=".. kwh)
         else 
-            luup.log("Response from YouLess respons invalid: does not contain cnt")
+            luup.log("Youless2: Response from YouLess respons invalid: does not contain cnt")
             luup.variable_set(HA_SERVICE,"CommFailure",1, YOULESS_DEVICE)
         end
 
         if (YOULESS_MODEL ~= "LS110") then -- following variables are not supported by LS110
             childS0id = findChild(YOULESS_DEVICE, YOULESS_S0_ALTID)
             if (childS0id ~= nil) then
-                luup.log("Child S0: " .. childS0id)
+                luup.log("Youless2: Child S0=" .. childS0id)
+            
+                -- read watts s0 (ps0)
+                local wattss0 = string.match(page,'"ps0":(.-),')
+                if (wattss0 ~= nil and wattss0 ~= '') then
+                    wattss0 = tonumber(wattss0)
+                    luup.log("Youless2: ps0="..wattss0)
+                    luup.variable_set(ENERGY_SERVICE, "Watts_S0", wattss0, YOULESS_DEVICE)
+                    if ((childS0id or "") ~= "") then
+                        luup.variable_set(ENERGY_SERVICE, "Watts", wattss0, childS0id)
+                    end
+                else 
+                    luup.log("Youless2: No ps0 found")
+                end
+
+                -- read kwh s0 (cs0)
+                local kwhs0 =  string.match(page,'"cs0":"(.-)"')
+                if (kwhs0 ~= nil and kwhs0 ~= '') then
+                    kwhs0 = string.gsub( kwhs0, "%s+", "")
+                    kwhs0 = string.gsub(kwhs0,",",".")
+                    kwhs0 = tonumber(kwhs0)
+                    luup.variable_set(ENERGY_SERVICE,"KWH_S0", kwhs0, YOULESS_DEVICE)
+                    if ((childS0id or "") ~= "") then
+                        luup.variable_set(ENERGY_SERVICE, "KWH", kwhs0, childS0id)
+                    end
+                    luup.log("Youless2: kwhs0=".. kwhs0)
+                else 
+                    luup.log("Youless2: No cs0 found")
+                end
             else
-                luup.log("No child S0 found")
-            end
-
-            -- read watts s0 (ps0)
-            local wattss0 = string.match(page,'"ps0":(.-),')
-            if (wattss0 ~= nil and wattss0 ~= '') then
-                wattss0 = tonumber(wattss0)
-                luup.log("YouLess ps0="..wattss0)
-                luup.variable_set(ENERGY_SERVICE, "Watts_S0", wattss0, YOULESS_DEVICE)
-                if ((childS0id or "") ~= "") then
-                    luup.variable_set(ENERGY_SERVICE, "Watts", wattss0, childS0id)
-                end
-            else 
-                luup.log("No ps0 found")
-            end
-
-            -- read kwh s0 (cs0)
-            local kwhs0 =  string.match(page,'"cs0":"(.-)"')
-            if (kwhs0 ~= nil and kwhs0 ~= '') then
-                kwhs0 = string.gsub( kwhs0, "%s+", "")
-                kwhs0 = string.gsub(kwhs0,",",".")
-                kwhs0 = tonumber(kwhs0)
-                luup.variable_set(ENERGY_SERVICE,"KWH_S0", kwhs0, YOULESS_DEVICE)
-                if ((childS0id or "") ~= "") then
-                    luup.variable_set(ENERGY_SERVICE, "KWH", kwhs0, childS0id)
-                end
-                luup.log("YouLess kwhs0=".. kwhs0)
-            else 
-                luup.log("No cs0 found")
+                luup.log("Youless2: No child S0 found")
             end
         end
     end
@@ -104,7 +104,7 @@ function refreshCache()
 end
 
 function Youless_Init(youless_device)
-    luup.log("Starting YouLess2")
+    luup.log("Youless2: Starting")
     YOULESS_DEVICE = youless_device
     YOULESS_IP = luup.attr_get('ip',YOULESS_DEVICE)
     
@@ -118,26 +118,26 @@ function Youless_Init(youless_device)
     -- check the connection
     local status, page = luup.inet.wget(YOULESS_URL_ACTUAL)
     if ((status or 0) ~= 0) then
-        return false, "Connection to YouLess failed. Verify the Youless ip-address.", string.format("%s[%d]", luup.devices[YOULESS_DEVICE].description, YOULESS_DEVICE)
+        return false, "Connection to YouLess failed. Verify the Youless ip-address and that no password is set on the Youless", string.format("%s[%d]", luup.devices[YOULESS_DEVICE].description, YOULESS_DEVICE)
     end
 
     status,page = luup.inet.wget(YOULESS_URL_DEVICE)
     if ((status or 0) ~= 0) then
         YOULESS_MODEL = "LS110" -- device page not available, therefore assuming LS110
         luup.variable_set(ENERGY_SERVICE, "Model", YOULESS_MODEL, YOULESS_DEVICE)
-        luup.log("YouLess model="..YOULESS_MODEL)
+        luup.log("Youless2: device page not found, therefore model="..YOULESS_MODEL)
     else 
         local model = string.match(page,'"model":"(.-)",')
         if (model ~= nil and model ~= '') then
             YOULESS_MODEL = string.gsub( model, "%s+", "") 
             luup.variable_set(ENERGY_SERVICE, "Model", YOULESS_MODEL, YOULESS_DEVICE)
-            luup.log("YouLess model="..YOULESS_MODEL)
+            luup.log("Youless2: model="..YOULESS_MODEL)
         else 
-            luup.log("Found device page, but failed to get model name")
+            luup.log("Youless2: Found device page, but failed to get model name")
         end
     end
 
-    luup.log("Youless found at " .. YOULESS_IP)
+    luup.log("Youless2: YouLess found at " .. YOULESS_IP)
 
     if ((YOULESS_MODEL or "") ~= "LS110") then
         local ChildDeviceS0 = luup.variable_get(YOULESS_SERVICE, "ChildDeviceS0", YOULESS_DEVICE)
@@ -149,7 +149,7 @@ function Youless_Init(youless_device)
         -- create child devices if needed
         local child_devices = luup.chdev.start(YOULESS_DEVICE)
         if (ChildDeviceS0 == "1") then
-            luup.log("Adding child device for YouLess S0")
+            luup.log("Youless2: Adding child device for YouLess S0")
             local init=ENERGY_SERVICE .. ",ActualUsage=1\n" .. 
                 ENERGY_SERVICE .. ",Watts=0\n" .. 
                 ENERGY_SERVICE .. ",KWH=0\n"

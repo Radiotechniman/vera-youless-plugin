@@ -54,7 +54,7 @@ local function readYouLess()
             kwh = tonumber(kwh)
             luup.variable_set(ENERGY_SERVICE,"KWH", kwh, YOULESS_DEVICE)
             luup.log("YouLess kwh (cnt)=".. kwh)
-        elseif () 
+        else 
             luup.log("Response from YouLess respons invalid: does not contain cnt")
             luup.variable_set(HA_SERVICE,"CommFailure",1, YOULESS_DEVICE)
         end
